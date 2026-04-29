@@ -3,373 +3,464 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Аналитический отчет: Мережа Права</title>
-    
-    <!-- Tailwind CSS -->
+    <title>Стратегический анализ: Мережа Права</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <!-- Chosen Palette: Navy Blue, Slate Gray, Soft Blue accents to reflect trust, legality, and calm professionalism -->
-    <!-- Application Structure Plan: The SPA is designed as a dynamic executive dashboard. It starts with high-level metrics to establish credibility. The 'Services' section uses interactive tabs to prevent information overload, allowing users to explore specific legal practices (Pensions, Military Law). A dedicated 'Analytics' section visualizes success rates and growth using Chart.js. Finally, a step-by-step 'Process' section explains the client journey. This structure was chosen to guide the user logically from 'Who they are' to 'What they do', 'How well they do it', and 'How to engage'. -->
-    <!-- Visualization & Content Choices: 
-         1. Key Metrics: Static large numbers in a grid -> Goal: Establish immediate authority -> Interaction: Hover effects.
-         2. Services Breakdown: Interactive tabs + dynamic text -> Goal: Categorize complex legal services -> Interaction: Click tabs to reveal details without scrolling -> Method: Vanilla JS DOM manipulation.
-         3. Case Typology & Success Rate: Doughnut Chart (Chart.js) -> Goal: Show portfolio distribution -> Interaction: Tooltips on hover.
-         4. Client Growth: Line Chart (Chart.js) -> Goal: Demonstrate market expansion -> Interaction: Tooltips.
-         (NO SVG/Mermaid used. Icons are Unicode or CSS-based). -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
-
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* Essential Chart Container Constraints */
-        .chart-container {
-            position: relative;
-            width: 100%;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-            height: 300px;
-            max-height: 400px;
-        }
-        @media (min-width: 768px) {
-            .chart-container {
-                height: 350px;
-            }
-        }
-        
-        /* Smooth transitions */
-        .tab-btn { transition: all 0.3s ease; }
-        .fade-in { animation: fadeIn 0.5s ease-in-out; }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* CSS-based step timeline */
-        .timeline-step::before {
-            content: '';
-            position: absolute;
-            left: -1.25rem;
-            top: 0.5rem;
-            width: 0.75rem;
-            height: 0.75rem;
-            border-radius: 50%;
-            background-color: #1d4ed8; /* blue-700 */
-        }
-        .timeline-step:not(:last-child)::after {
-            content: '';
-            position: absolute;
-            left: -0.9375rem; /* center the line */
-            top: 1.5rem;
-            bottom: -1rem;
-            width: 2px;
-            background-color: #bfdbfe; /* blue-200 */
-        }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #0f172a; }
+        .chart-container { position: relative; width: 100%; max-width: 700px; margin: 0 auto; height: 350px; max-height: 400px; }
+        .content-section { display: none; }
+        .content-section.active { display: block; animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .sidebar-item.active { background-color: #2563eb; color: white; box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.4); }
+        .legal-gradient { background: linear-gradient(135deg, #1e293b 0%, #334155 100%); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans antialiased">
+<body class="flex flex-col md:flex-row h-screen">
 
-    <!-- Header Section -->
-    <header class="bg-blue-900 text-white py-12 px-4 shadow-md">
-        <div class="max-w-5xl mx-auto">
-            <h1 class="text-3xl md:text-5xl font-bold mb-4">Аналитический профиль: <span class="text-blue-300">Мережа Права</span></h1>
-            <p class="text-lg md:text-xl text-blue-100 max-w-3xl leading-relaxed">
-                Интерактивный отчет о деятельности ведущей юридической компании Украины. Специализация: защита прав военнослужащих, пенсионеров силовых структур и социальное обеспечение.
-            </p>
+<!-- Chosen Palette: Navy Legal (Сланцевый темно-синий), Professional Blue (Королевский синий), Emerald Success (Изумрудный для финансов) -->
+<!-- Application Structure Plan: 
+    1. Иерархический дашборд. 
+    2. Раздел "Институциональный генезис": фокус на истории и структуре владения.
+    3. Раздел "Финансовая архитектура": интерактивные графики выручки.
+    4. Раздел "Операционный завод": визуализация конвейера и академии Merlid.
+    5. Раздел "Правовое поле": детальный разбор пенсионных и военных кейсов.
+    6. Раздел "Человеческий капитал": зарплаты и отзывы.
+    Выбрано для максимальной наглядности трансформации бизнеса из частной практики в холдинг.
+-->
+<!-- Visualization & Content Choices:
+    - Выручка холдинга: Stacked Bar Chart (Chart.js) для сравнения лиц.
+    - Структура владения: Doughnut Chart (Chart.js).
+    - Уровни зарплат: Horizontal Bar Chart.
+    - Операционная модель: Интерактивные карточки процессов.
+    CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
+-->
+
+<!-- Sidebar -->
+<aside class="w-full md:w-80 bg-slate-900 text-white flex flex-col z-30 shrink-0 md:h-screen sticky top-0 border-r border-slate-800">
+    <div class="p-8">
+        <div class="flex items-center gap-3 mb-2">
+            <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-xl shadow-lg">⚖</div>
+            <h1 class="text-xl font-extrabold tracking-tighter">МЕРЕЖА ПРАВА</h1>
         </div>
-    </header>
+        <p class="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Институциональная оценка 2026</p>
+    </div>
 
-    <main class="max-w-5xl mx-auto px-4 py-8 space-y-16">
+    <nav class="flex-grow px-4 space-y-1 overflow-y-auto no-scrollbar pb-6">
+        <button onclick="showSection('summary')" id="nav-summary" class="sidebar-item active w-full text-left px-4 py-3 rounded-xl transition-all text-sm font-semibold flex items-center gap-3">
+            <span>🏠</span> Обзор стратегии
+        </button>
+        <button onclick="showSection('genesis')" id="nav-genesis" class="sidebar-item w-full text-left px-4 py-3 rounded-xl transition-all text-sm font-semibold flex items-center gap-3 text-slate-400 hover:text-white">
+            <span>📜</span> Институциональный генезис
+        </button>
+        <button onclick="showSection('finance')" id="nav-finance" class="sidebar-item w-full text-left px-4 py-3 rounded-xl transition-all text-sm font-semibold flex items-center gap-3 text-slate-400 hover:text-white">
+            <span>📊</span> Экономическая архитектура
+        </button>
+        <button onclick="showSection('ops')" id="nav-ops" class="sidebar-item w-full text-left px-4 py-3 rounded-xl transition-all text-sm font-semibold flex items-center gap-3 text-slate-400 hover:text-white">
+            <span>⚙</span> Операционная модель
+        </button>
+        <button onclick="showSection('law')" id="nav-law" class="sidebar-item w-full text-left px-4 py-3 rounded-xl transition-all text-sm font-semibold flex items-center gap-3 text-slate-400 hover:text-white">
+            <span>⚔</span> Правовое поле
+        </button>
+        <button onclick="showSection('hr')" id="nav-hr" class="sidebar-item w-full text-left px-4 py-3 rounded-xl transition-all text-sm font-semibold flex items-center gap-3 text-slate-400 hover:text-white">
+            <span>👥</span> Кадры и Зарплаты
+        </button>
+    </nav>
+    
+    <div class="p-6 border-t border-slate-800 text-[11px] text-slate-500">
+        &copy; 2026 Strategic Research Dept.<br>Данные из открытых источников.
+    </div>
+</aside>
 
-        <!-- Section 1: Executive Summary / Metrics -->
-        <section id="metrics">
-            <div class="mb-6">
-                <h2 class="text-2xl font-bold text-slate-800 border-b-2 border-blue-200 pb-2 inline-block">Ключевые показатели</h2>
-                <p class="text-slate-600 mt-2">Анализ рыночного влияния и результативности компании на основе открытых данных судебных реестров и публичной отчетности.</p>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Metric Card 1 -->
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
-                    <div class="text-4xl mb-2 text-blue-600">&#9878;</div>
-                    <div class="text-3xl font-bold text-slate-800">15,000+</div>
-                    <div class="text-sm font-semibold text-slate-500 uppercase tracking-wide">Успешных дел</div>
-                    <p class="text-sm text-slate-600 mt-2">В судах первой и апелляционной инстанций против ПФУ и других госорганов.</p>
+<!-- Main -->
+<main class="flex-grow overflow-y-auto bg-slate-50 relative">
+
+    <!-- SECTION 1: SUMMARY -->
+    <section id="sec-summary" class="content-section active p-6 md:p-12">
+        <div class="max-w-5xl mx-auto">
+            <header class="mb-12">
+                <h2 class="text-4xl font-black text-slate-900 leading-none mb-4">Трансформация юридического поля Украины</h2>
+                <div class="h-1.5 w-24 bg-blue-600 rounded-full mb-6"></div>
+                <p class="text-lg text-slate-600 leading-relaxed max-w-3xl italic">
+                    «Переход от индивидуальной адвокатской практики к масштабным индустриальным моделям... В центре этой трансформации находится холдинг Мережа Права».
+                </p>
+            </header>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                    <p class="text-3xl font-black text-blue-600">80k+</p>
+                    <p class="text-xs uppercase font-bold text-slate-400 mt-1">Активных клиентов</p>
                 </div>
-                <!-- Metric Card 2 -->
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
-                    <div class="text-4xl mb-2 text-blue-600">&#128176;</div>
-                    <div class="text-3xl font-bold text-slate-800">1.2 млрд ₴</div>
-                    <div class="text-sm font-semibold text-slate-500 uppercase tracking-wide">Возвращено клиентам</div>
-                    <p class="text-sm text-slate-600 mt-2">Суммарный объем отсуженных невыплаченных пенсий и социальных пособий.</p>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                    <p class="text-3xl font-black text-emerald-600">68M+</p>
+                    <p class="text-xs uppercase font-bold text-slate-400 mt-1">Годовая выручка (грн)</p>
                 </div>
-                <!-- Metric Card 3 -->
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
-                    <div class="text-4xl mb-2 text-blue-600">&#127986;</div>
-                    <div class="text-3xl font-bold text-slate-800">95%</div>
-                    <div class="text-sm font-semibold text-slate-500 uppercase tracking-wide">Процент побед (Пенсии)</div>
-                    <p class="text-sm text-slate-600 mt-2">Высокий показатель успешности в типовых делах по перерасчету пенсий силовикам.</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Section 2: Interactive Services Analysis -->
-        <section id="services" class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
-            <div class="mb-6">
-                <h2 class="text-2xl font-bold text-slate-800 border-b-2 border-blue-200 pb-2 inline-block">Структура юридической практики</h2>
-                <p class="text-slate-600 mt-2">Выберите направление ниже, чтобы изучить специфику работы, типичные проблемы клиентов и методы их решения, применяемые "Мережа Права".</p>
-            </div>
-
-            <div class="flex flex-col md:flex-row gap-8">
-                <!-- Navigation Tabs -->
-                <div class="md:w-1/3 flex flex-col space-y-2">
-                    <button onclick="updateService('pension')" id="btn-pension" class="tab-btn active bg-blue-600 text-white font-medium py-3 px-4 rounded-lg text-left shadow-sm">Перерасчет военных пенсий</button>
-                    <button onclick="updateService('military')" id="btn-military" class="tab-btn bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-3 px-4 rounded-lg text-left">Военное право (Мобилизация/ВЛК)</button>
-                    <button onclick="updateService('social')" id="btn-social" class="tab-btn bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-3 px-4 rounded-lg text-left">Социальные выплаты (УБД, ВПО)</button>
-                </div>
-
-                <!-- Dynamic Content Area -->
-                <div class="md:w-2/3 bg-slate-50 p-6 rounded-xl border border-slate-100 min-h-[300px]" id="service-content">
-                    <!-- Content injected via JS -->
-                </div>
-            </div>
-        </section>
-
-        <!-- Section 3: Data Visualizations -->
-        <section id="analytics">
-            <div class="mb-6">
-                <h2 class="text-2xl font-bold text-slate-800 border-b-2 border-blue-200 pb-2 inline-block">Аналитика и динамика</h2>
-                <p class="text-slate-600 mt-2">Визуализация распределения дел по категориям и рост обращений граждан за правовой защитой за последние годы.</p>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <!-- Chart 1 -->
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                    <h3 class="text-lg font-bold text-slate-800 text-center mb-4">Структура дел в производстве</h3>
-                    <div class="chart-container">
-                        <canvas id="portfolioChart"></canvas>
-                    </div>
-                    <p class="text-sm text-slate-500 text-center mt-4">Львиная доля обращений приходится на иски против Пенсионного Фонда (снятие лимитов, учет премий).</p>
-                </div>
-
-                <!-- Chart 2 -->
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                    <h3 class="text-lg font-bold text-slate-800 text-center mb-4">Динамика клиентской базы (оценка)</h3>
-                    <div class="chart-container">
-                        <canvas id="growthChart"></canvas>
-                    </div>
-                    <p class="text-sm text-slate-500 text-center mt-4">Резкий рост обращений связан с изменениями в законодательстве и активными действиями ТЦК и СП.</p>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                    <p class="text-3xl font-black text-orange-600">470+</p>
+                    <p class="text-xs uppercase font-bold text-slate-400 mt-1">Штатных специалистов</p>
                 </div>
             </div>
-        </section>
 
-        <!-- Section 4: Operational Process -->
-        <section id="process" class="bg-blue-50 p-8 rounded-2xl border border-blue-100 mb-12">
-            <div class="mb-8">
-                <h2 class="text-2xl font-bold text-slate-800 border-b-2 border-blue-300 pb-2 inline-block">Алгоритм работы (Client Journey)</h2>
-                <p class="text-slate-600 mt-2">Стандартизированный процесс оказания юридических услуг, обеспечивающий высокую конверсию в положительные решения судов.</p>
-            </div>
-
-            <div class="pl-6 relative">
-                <!-- Step 1 -->
-                <div class="timeline-step relative pl-6 pb-8">
-                    <h4 class="text-lg font-bold text-blue-900">1. Бесплатная консультация и аудит</h4>
-                    <p class="text-slate-700 mt-1">Юристы изучают документы клиента (например, справки из ТЦК о денежном довольствии). Проводится просчет потенциальной суммы долга государства перед пенсионером.</p>
-                </div>
-                <!-- Step 2 -->
-                <div class="timeline-step relative pl-6 pb-8">
-                    <h4 class="text-lg font-bold text-blue-900">2. Досудебное урегулирование</h4>
-                    <p class="text-slate-700 mt-1">Подготовка и подача адвокатских запросов в государственные органы (ПФУ, Минобороны). Фиксация официального отказа (чаще всего ПФУ отказывает в перерасчете добровольно).</p>
-                </div>
-                <!-- Step 3 -->
-                <div class="timeline-step relative pl-6 pb-8">
-                    <h4 class="text-lg font-bold text-blue-900">3. Судебное производство</h4>
-                    <p class="text-slate-700 mt-1">Подготовка искового заявления в окружной административный суд. Компания ведет дело "под ключ" без личного присутствия клиента (по доверенности).</p>
-                </div>
-                <!-- Step 4 -->
-                <div class="timeline-step relative pl-6">
-                    <h4 class="text-lg font-bold text-blue-900">4. Исполнительное производство</h4>
-                    <p class="text-slate-700 mt-1">Получение решения суда и исполнительного листа. Взаимодействие с исполнительной службой и казначейством до момента фактического зачисления средств на карту клиента.</p>
-                </div>
-            </div>
-        </section>
-
-    </main>
-
-    <footer class="bg-slate-900 text-slate-400 py-6 text-center text-sm">
-        <p>© 2026 Интерактивный аналитический отчет. Данные агрегированы из открытых источников и судебных реестров.</p>
-    </footer>
-
-    <!-- Application Logic -->
-    <script>
-        // --- Data Storage for Interactive Services Section ---
-        const servicesData = {
-            pension: {
-                title: "Перерасчет военных пенсий",
-                icon: "&#128200;",
-                problem: "Пенсионный фонд Украины (ПФУ) часто не учитывает дополнительные виды денежного обеспечения (премии, надбавки) при расчете пенсий бывшим военным, милиционерам, спасателям.",
-                solution: "Сбор справок о реальном денежном обеспечении с последнего места службы, обжалование бездействия ПФУ в суде, принудительное снятие «максимального ограничения» пенсии.",
-                result: "Увеличение ежемесячной пенсии в среднем на 30-70% и выплата задолженности государством за прошлые периоды одной суммой."
-            },
-            military: {
-                title: "Военное право",
-                icon: "&#9876;",
-                problem: "Нарушения при мобилизации, незаконные отказы в предоставлении отсрочки, игнорирование рапортов на ВЛК (Военно-врачебную комиссию) или увольнение по семейным обстоятельствам.",
-                solution: "Написание юридически грамотных рапортов, подача адвокатских запросов командирам частей, обжалование выводов ВЛК в Центральной ВЛК или суде, сопровождение в ТЦК.",
-                result: "Обеспечение законных прав военнослужащих: перевод, лечение, законное увольнение со службы или получение законной отсрочки."
-            },
-            social: {
-                title: "Социальные выплаты (УБД, ВПО)",
-                icon: "&#128106;",
-                problem: "Отказ государства в выплате «боевых» (100 тыс. грн), невыплата единовременной денежной помощи (ОГД) при ранении или гибели, лишение статуса ВПО.",
-                solution: "Формирование пакета доказательств участия в боевых действиях, расследование обстоятельств травмы, судебные иски против Минсоцполитики и воинских частей.",
-                result: "Фактическое получение клиентами положенных по закону миллионных выплат по ранению или гибели кормильца."
-            }
-        };
-
-        // --- Core Interaction Handling: Tab Switching ---
-        function updateService(serviceKey) {
-            // Update button styles
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('bg-blue-600', 'text-white', 'shadow-sm', 'active');
-                btn.classList.add('bg-slate-100', 'text-slate-700');
-            });
-            const activeBtn = document.getElementById(`btn-${serviceKey}`);
-            activeBtn.classList.remove('bg-slate-100', 'text-slate-700');
-            activeBtn.classList.add('bg-blue-600', 'text-white', 'shadow-sm', 'active');
-
-            // Update content with animation
-            const contentArea = document.getElementById('service-content');
-            const data = servicesData[serviceKey];
-            
-            // Remove animation class to reset it
-            contentArea.classList.remove('fade-in');
-            
-            // Force reflow
-            void contentArea.offsetWidth;
-            
-            contentArea.innerHTML = `
-                <div class="flex items-center space-x-3 mb-4">
-                    <span class="text-3xl text-blue-600">${data.icon}</span>
-                    <h3 class="text-xl font-bold text-slate-800">${data.title}</h3>
-                </div>
-                <div class="space-y-4 text-slate-700">
-                    <div>
-                        <strong class="text-slate-900 block mb-1">Проблема:</strong>
-                        <p>${data.problem}</p>
-                    </div>
-                    <div class="border-l-4 border-blue-500 pl-4 py-1">
-                        <strong class="text-slate-900 block mb-1">Действия юристов:</strong>
-                        <p>${data.solution}</p>
-                    </div>
-                    <div class="bg-green-50 p-3 rounded-lg border border-green-200">
-                        <strong class="text-green-800 block mb-1">Типичный результат:</strong>
-                        <p class="text-green-700 font-medium">${data.result}</p>
+            <div class="bg-slate-900 text-white p-8 rounded-3xl shadow-2xl relative overflow-hidden">
+                <div class="relative z-10">
+                    <h3 class="text-2xl font-bold mb-4">Индустриальный подход</h3>
+                    <p class="text-slate-400 leading-relaxed mb-6">
+                        Компания де-факто создала «юридический завод», где типовые административные процедуры автоматизированы и поставлены на поток. Это позволяет удерживать лидерство в сегменте, где традиционные адвокатские бюро не конкурентоспособны.
+                    </p>
+                    <div class="flex flex-wrap gap-3">
+                        <span class="bg-white/10 px-3 py-1 rounded-full text-xs font-semibold">12 Офисов</span>
+                        <span class="bg-white/10 px-3 py-1 rounded-full text-xs font-semibold">Mobile App AI</span>
+                        <span class="bg-white/10 px-3 py-1 rounded-full text-xs font-semibold">CRM Control</span>
                     </div>
                 </div>
-            `;
-            
-            // Add animation class
-            contentArea.classList.add('fade-in');
-        }
+                <div class="absolute bottom-[-30px] right-[-20px] text-9xl opacity-5 font-black uppercase">FACTORY</div>
+            </div>
+        </div>
+    </section>
 
-        // Initialize first tab
-        document.addEventListener('DOMContentLoaded', () => {
-            updateService('pension');
-            initCharts();
+    <!-- SECTION 2: GENESIS -->
+    <section id="sec-genesis" class="content-section p-6 md:p-12">
+        <div class="max-w-5xl mx-auto">
+            <header class="mb-10">
+                <h2 class="text-3xl font-black text-slate-900 mb-2">Институциональный генезис</h2>
+                <p class="text-slate-500">От персонализированного бренда к национальному оператору.</p>
+            </header>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
+                <div class="space-y-8">
+                    <div class="border-l-4 border-blue-600 pl-6 space-y-2">
+                        <p class="text-xs font-bold text-blue-600">Май 2021</p>
+                        <h4 class="font-bold text-xl text-slate-800">Основание ООО «ГЛАЗОВ»</h4>
+                        <p class="text-sm text-slate-600">Регистрация в Одессе. Ключевая роль основателя Владимира Глазова.</p>
+                    </div>
+                    <div class="border-l-4 border-blue-600 pl-6 space-y-2">
+                        <p class="text-xs font-bold text-blue-600">Октябрь 2021</p>
+                        <h4 class="font-bold text-xl text-slate-800">Ребрендинг в «МЕРЕЖА ПРАВА»</h4>
+                        <p class="text-sm text-slate-600">Смена вектора на сетевую структуру и масштабируемость.</p>
+                    </div>
+                    <div class="border-l-4 border-blue-600 pl-6 space-y-2">
+                        <p class="text-xs font-bold text-blue-600">Август 2023</p>
+                        <h4 class="font-bold text-xl text-slate-800">Экспансия в Киев</h4>
+                        <p class="text-sm text-slate-600">Создание ТОВ «МЕРЕЖА ПРАВА КИЕВ» и переход на общую систему налогообложения.</p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                    <h3 class="text-center font-bold text-slate-700 mb-4 uppercase text-xs tracking-widest">Структура собственности (Капитал)</h3>
+                    <div class="chart-container" style="height: 250px;">
+                        <canvas id="ownershipChart"></canvas>
+                    </div>
+                    <div class="mt-6 space-y-3">
+                        <div class="flex justify-between text-sm items-center p-2 bg-slate-50 rounded-lg">
+                            <span class="font-medium">Глазов В.О.</span>
+                            <span class="font-bold text-blue-600">94%</span>
+                        </div>
+                        <div class="flex justify-between text-sm items-center p-2">
+                            <span class="font-medium text-slate-500">Кривий М.В.</span>
+                            <span class="font-bold">5%</span>
+                        </div>
+                        <div class="flex justify-between text-sm items-center p-2">
+                            <span class="font-medium text-slate-500">Глазова Е.Н.</span>
+                            <span class="font-bold">1%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 3: FINANCE -->
+    <section id="sec-finance" class="content-section p-6 md:p-12">
+        <div class="max-w-5xl mx-auto">
+            <header class="mb-10">
+                <h2 class="text-3xl font-black text-slate-900 mb-2">Финансовая архитектура</h2>
+                <p class="text-slate-500">Синергия юридических лиц холдинга в показателях 2025 года.</p>
+            </header>
+
+            <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 mb-10">
+                <h3 class="text-center font-bold text-slate-700 mb-8 uppercase text-xs tracking-widest">Выручка по ключевым субъектам (млн грн)</h3>
+                <div class="chart-container">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto rounded-2xl border border-slate-100 shadow-sm bg-white">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-slate-50 text-slate-500 uppercase text-[10px] font-bold">
+                        <tr>
+                            <th class="px-6 py-4">Юридическое лицо</th>
+                            <th class="px-6 py-4">ЕДРПОУ</th>
+                            <th class="px-6 py-4 text-right">Выручка 2025</th>
+                            <th class="px-6 py-4 text-right">Статус</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        <tr>
+                            <td class="px-6 py-4 font-bold">ООО «МЕРЕЖА ПРАВА»</td>
+                            <td class="px-6 py-4 text-slate-500">44201955</td>
+                            <td class="px-6 py-4 text-right font-bold text-blue-600">51.14 млн</td>
+                            <td class="px-6 py-4 text-right"><span class="px-2 py-1 bg-green-100 text-green-700 text-[10px] rounded-full font-bold">Актив</span></td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 font-bold">ООО «МЕРЕЖА ПРАВА КИЕВ»</td>
+                            <td class="px-6 py-4 text-slate-500">45265674</td>
+                            <td class="px-6 py-4 text-right font-bold text-blue-600">8.98 млн</td>
+                            <td class="px-6 py-4 text-right"><span class="px-2 py-1 bg-blue-100 text-blue-700 text-[10px] rounded-full font-bold">Экспансия</span></td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 font-bold">АО «МЕРЕЖА ПРАВА»</td>
+                            <td class="px-6 py-4 text-slate-500">44996945</td>
+                            <td class="px-6 py-4 text-right font-bold text-blue-600">8.86 млн</td>
+                            <td class="px-6 py-4 text-right"><span class="px-2 py-1 bg-purple-100 text-purple-700 text-[10px] rounded-full font-bold">Адвокатура</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="mt-4 text-xs text-slate-400 italic text-center">Совокупная выручка холдинга превысила 68 миллионов гривен.</p>
+        </div>
+    </section>
+
+    <!-- SECTION 4: OPERATIONS -->
+    <section id="sec-ops" class="content-section p-6 md:p-12">
+        <div class="max-w-5xl mx-auto">
+            <header class="mb-10">
+                <h2 class="text-3xl font-black text-slate-900 mb-2">Операционная модель</h2>
+                <p class="text-slate-500">Внутреннее устройство юридического конвейера.</p>
+            </header>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                <div class="bg-blue-600 text-white p-8 rounded-3xl">
+                    <h3 class="text-xl font-bold mb-4">Академия «Мерлид»</h3>
+                    <p class="text-blue-100 text-sm leading-relaxed mb-6">
+                        Собственная платформа для обучения и повышения квалификации юристов. Консультанты не допускаются к клиентам без прохождения тестирования на знание жестких регламентов общения.
+                    </p>
+                    <ul class="space-y-2 text-xs">
+                        <li class="flex items-center gap-2"><span>✔</span> Психология работы с пенсионерами</li>
+                        <li class="flex items-center gap-2"><span>✔</span> Скрипты отработки возражений</li>
+                        <li class="flex items-center gap-2"><span>✔</span> База знаний по Постановлению 821</li>
+                    </ul>
+                </div>
+
+                <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm flex flex-col justify-center">
+                    <h3 class="text-xl font-bold mb-4 text-slate-800">Технологичность</h3>
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="text-4xl">📱</div>
+                        <div>
+                            <p class="font-bold">Мобильное приложение</p>
+                            <p class="text-xs text-slate-500">Отслеживание исков в реальном времени.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="text-4xl">🤖</div>
+                        <div>
+                            <p class="font-bold">CRM-система</p>
+                            <p class="text-xs text-slate-500">Фиксация каждого этапа: от лида до исполнения.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-slate-100 p-8 rounded-3xl border border-slate-200">
+                <h3 class="font-bold text-slate-800 mb-6 text-center uppercase tracking-tighter">Схема работы</h3>
+                <div class="flex flex-col md:flex-row gap-4 items-stretch">
+                    <div class="flex-1 bg-white p-5 rounded-xl text-center shadow-sm">
+                        <div class="text-2xl mb-2">📞</div>
+                        <p class="font-bold text-sm">Call-центр</p>
+                        <p class="text-[10px] text-slate-500 mt-1">Первичная воронка: 736k+ консультаций</p>
+                    </div>
+                    <div class="flex items-center justify-center text-slate-300 md:rotate-0 rotate-90">⮕</div>
+                    <div class="flex-1 bg-white p-5 rounded-xl text-center shadow-sm">
+                        <div class="text-2xl mb-2">📄</div>
+                        <p class="font-bold text-sm">Делопроизводство</p>
+                        <p class="text-[10px] text-slate-500 mt-1">Подготовка типовых исков (320 чел.)</p>
+                    </div>
+                    <div class="flex items-center justify-center text-slate-300 md:rotate-0 rotate-90">⮕</div>
+                    <div class="flex-1 bg-white p-5 rounded-xl text-center shadow-sm border-2 border-blue-500">
+                        <div class="text-2xl mb-2">⚖</div>
+                        <p class="font-bold text-sm">Судебный блок</p>
+                        <p class="text-[10px] text-slate-500 mt-1">Адвокаты и 80k+ решений</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 5: LAW -->
+    <section id="sec-law" class="content-section p-6 md:p-12">
+        <div class="max-w-5xl mx-auto">
+            <header class="mb-10">
+                <h2 class="text-3xl font-black text-slate-900 mb-2">Правовое поле и Кейсы</h2>
+                <p class="text-slate-500">Борьба с системной бюрократией и защита военнослужащих.</p>
+            </header>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
+                    <h3 class="font-bold text-red-600 text-xl mb-4">Битва с Постановлением № 821</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed mb-6">
+                        Постановление № 821 — барьер, позволяющий государству выплачивать долги по судам частями. Мережа Права инициировала 6 крупных производств для признания его незаконным.
+                    </p>
+                    <div class="bg-red-50 p-4 rounded-xl">
+                        <p class="text-xs font-bold text-red-800">Статус: В процессе обжалования</p>
+                        <p class="text-[10px] text-red-600 mt-1">Позиционирование как единственной силы, способной преодолеть дефицит ПФУ.</p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
+                    <h3 class="font-bold text-blue-900 text-xl mb-4">Кейс: 1 млн грн для Нацгвардейца</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed mb-6">
+                        Взыскание компенсации за ранение, в которой отказывала в/ч из-за отсутствия документов. Повторные запросы и жалобы адвокатов позволили добиться выплаты 985 000 грн.
+                    </p>
+                    <div class="bg-blue-50 p-4 rounded-xl">
+                        <p class="text-xs font-bold text-blue-800">Маркетинговый эффект: Высокий</p>
+                        <p class="text-[10px] text-blue-600 mt-1">Инструмент социального маркетинга и доверия.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-10 bg-slate-900 p-8 rounded-3xl text-white">
+                <h3 class="font-bold mb-6 text-center">Вертикали услуг и аудитория</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-center">
+                    <div class="p-4 border border-white/10 rounded-xl">
+                        <p class="text-xl">🪖</p>
+                        <p class="text-xs font-bold mt-2">Военные пенсии</p>
+                    </div>
+                    <div class="p-4 border border-white/10 rounded-xl">
+                        <p class="text-xl">👴</p>
+                        <p class="text-xs font-bold mt-2">Гражданские пенсии</p>
+                    </div>
+                    <div class="p-4 border border-white/10 rounded-xl">
+                        <p class="text-xl">🚑</p>
+                        <p class="text-xs font-bold mt-2">Раненые (Контракт 18-24)</p>
+                    </div>
+                    <div class="p-4 border border-white/10 rounded-xl">
+                        <p class="text-xl">🏠</p>
+                        <p class="text-xs font-bold mt-2">Семейное право</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 6: HR -->
+    <section id="sec-hr" class="content-section p-6 md:p-12">
+        <div class="max-w-5xl mx-auto">
+            <header class="mb-10">
+                <h2 class="text-3xl font-black text-slate-900 mb-2">Человеческий капитал</h2>
+                <p class="text-slate-500">Система «Ставка + KPI» и уровни компенсаций 2025-2026.</p>
+            </header>
+
+            <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 mb-10">
+                <h3 class="text-center font-bold text-slate-700 mb-8 uppercase text-xs tracking-widest">Уровни зарплат по должностям (грн)</h3>
+                <div class="chart-container">
+                    <canvas id="salaryChart"></canvas>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+                <div class="bg-green-50 p-8 rounded-3xl border border-green-100">
+                    <h3 class="font-bold text-green-900 mb-4">Плюсы работы</h3>
+                    <ul class="text-sm text-green-800 space-y-3">
+                        <li class="flex items-center gap-2"><span>✔</span> Системная школа для новичков</li>
+                        <li class="flex items-center gap-2"><span>✔</span> Скидка 40% на услуги компании</li>
+                        <li class="flex items-center gap-2"><span>✔</span> Бонусы от 60+ партнеров</li>
+                    </ul>
+                </div>
+                <div class="bg-orange-50 p-8 rounded-3xl border border-orange-100">
+                    <h3 class="font-bold text-orange-900 mb-4">Риски и Вызовы</h3>
+                    <ul class="text-sm text-orange-800 space-y-3">
+                        <li class="flex items-center gap-2"><span>⚠</span> Темп работы колл-центра</li>
+                        <li class="flex items-center gap-2"><span>⚠</span> Жесткий контроль KPI</li>
+                        <li class="flex items-center gap-2"><span>⚠</span> Предельная нагрузка (80k+ клиентов)</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="bg-white p-8 rounded-3xl border border-slate-100 italic text-slate-600 text-center shadow-sm">
+                "Мережа Права" — это образец новой формации юридического бизнеса: адаптивной, технологичной и социально-интегрированной.
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<script>
+    // Navigation logic
+    function showSection(id) {
+        document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.sidebar-item').forEach(i => {
+            i.classList.remove('active', 'bg-blue-600', 'text-white');
+            i.classList.add('text-slate-400');
         });
+        
+        document.getElementById('sec-' + id).classList.add('active');
+        const activeBtn = document.getElementById('nav-' + id);
+        activeBtn.classList.add('active');
+        activeBtn.classList.remove('text-slate-400');
+        
+        // Init charts if they belong to the section
+        if(id === 'genesis') initGenesisCharts();
+        if(id === 'finance') initFinanceCharts();
+        if(id === 'hr') initHRCharts();
+    }
 
-        // --- Chart.js Implementations ---
-        function initCharts() {
-            // Global Chart Config for responsiveness
-            Chart.defaults.maintainAspectRatio = false;
-            Chart.defaults.font.family = "'Inter', 'Segoe UI', sans-serif";
-            Chart.defaults.color = '#64748b';
+    // Chart Inits
+    let ownershipChart, revenueChart, salaryChart;
 
-            // 1. Portfolio Chart (Doughnut)
-            const ctxPortfolio = document.getElementById('portfolioChart').getContext('2d');
-            new Chart(ctxPortfolio, {
-                type: 'doughnut',
-                data: {
-                    labels: [
-                        'Военные пенсии (ПФУ)', 
-                        'Дела против ТЦК / ВЛК', 
-                        'Выплаты за ранения', 
-                        'Чернобыльские пенсии',
-                        'Другое'
-                    ],
-                    datasets: [{
-                        data: [55, 20, 15, 7, 3],
-                        backgroundColor: [
-                            '#1d4ed8', // blue-700
-                            '#3b82f6', // blue-500
-                            '#93c5fd', // blue-300
-                            '#64748b', // slate-500
-                            '#cbd5e1'  // slate-300
-                        ],
-                        borderWidth: 0,
-                        hoverOffset: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { position: 'bottom' },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return ' ' + context.label + ': ' + context.parsed + '%';
-                                }
-                            }
-                        }
-                    },
-                    cutout: '65%'
-                }
-            });
+    function initGenesisCharts() {
+        if(ownershipChart) return;
+        const ctx = document.getElementById('ownershipChart').getContext('2d');
+        ownershipChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Глазов В.О.', 'Кривий М.В.', 'Глазова Е.Н.'],
+                datasets: [{
+                    data: [94, 5, 1],
+                    backgroundColor: ['#2563eb', '#94a3b8', '#cbd5e1'],
+                    borderWidth: 0
+                }]
+            },
+            options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, cutout: '70%' }
+        });
+    }
 
-            // 2. Growth Chart (Line)
-            const ctxGrowth = document.getElementById('growthChart').getContext('2d');
-            new Chart(ctxGrowth, {
-                type: 'line',
-                data: {
-                    labels: ['2020', '2021', '2022', '2023', '2024'],
-                    datasets: [{
-                        label: 'Кол-во активных дел (оценка)',
-                        data: [1200, 2500, 6000, 11500, 15000],
-                        borderColor: '#2563eb', // blue-600
-                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                        borderWidth: 3,
-                        pointBackgroundColor: '#1e40af',
-                        pointBorderColor: '#fff',
-                        pointBorderWidth: 2,
-                        pointRadius: 5,
-                        fill: true,
-                        tension: 0.3 // Smooth curves
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            mode: 'index',
-                            intersect: false,
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: { color: '#f1f5f9', drawBorder: false },
-                            ticks: { maxTicksLimit: 6 }
-                        },
-                        x: {
-                            grid: { display: false, drawBorder: false }
-                        }
-                    }
-                }
-            });
-        }
-    </script>
+    function initFinanceCharts() {
+        if(revenueChart) return;
+        const ctx = document.getElementById('revenueChart').getContext('2d');
+        revenueChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['ООО Мережа Права', 'ООО Мережа Права Киев', 'АО Мережа Права'],
+                datasets: [{
+                    label: 'Выручка 2025 (млн грн)',
+                    data: [51.14, 8.98, 8.86],
+                    backgroundColor: '#2563eb',
+                    borderRadius: 10
+                }]
+            },
+            options: { maintainAspectRatio: false, scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } }, plugins: { legend: { display: false } } }
+        });
+    }
+
+    function initHRCharts() {
+        if(salaryChart) return;
+        const ctx = document.getElementById('salaryChart').getContext('2d');
+        salaryChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Мл. юрист', 'Делопроизводитель', 'Юрист (мидл)', 'Продажи (Партнер)', 'Топ-специалист'],
+                datasets: [{
+                    label: 'Средний доход (грн)',
+                    data: [14500, 17500, 22000, 35000, 60000],
+                    backgroundColor: ['#94a3b8', '#64748b', '#3b82f6', '#1d4ed8', '#16a34a'],
+                    borderRadius: 5
+                }]
+            },
+            options: { indexAxis: 'y', maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true } } }
+        });
+    }
+</script>
+
 </body>
 </html>

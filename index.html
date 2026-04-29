@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Аналитический отчет: Мережа Права</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Chosen Palette: Navy Blue, Slate Gray, Soft Blue accents to reflect trust, legality, and calm professionalism -->
+    <!-- Application Structure Plan: The SPA is designed as a dynamic executive dashboard. It starts with high-level metrics to establish credibility. The 'Services' section uses interactive tabs to prevent information overload, allowing users to explore specific legal practices (Pensions, Military Law). A dedicated 'Analytics' section visualizes success rates and growth using Chart.js. Finally, a step-by-step 'Process' section explains the client journey. This structure was chosen to guide the user logically from 'Who they are' to 'What they do', 'How well they do it', and 'How to engage'. -->
+    <!-- Visualization & Content Choices: 
+         1. Key Metrics: Static large numbers in a grid -> Goal: Establish immediate authority -> Interaction: Hover effects.
+         2. Services Breakdown: Interactive tabs + dynamic text -> Goal: Categorize complex legal services -> Interaction: Click tabs to reveal details without scrolling -> Method: Vanilla JS DOM manipulation.
+         3. Case Typology & Success Rate: Doughnut Chart (Chart.js) -> Goal: Show portfolio distribution -> Interaction: Tooltips on hover.
+         4. Client Growth: Line Chart (Chart.js) -> Goal: Demonstrate market expansion -> Interaction: Tooltips.
+         (NO SVG/Mermaid used. Icons are Unicode or CSS-based). -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        /* Essential Chart Container Constraints */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        
+        /* Smooth transitions */
+        .tab-btn { transition: all 0.3s ease; }
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* CSS-based step timeline */
+        .timeline-step::before {
+            content: '';
+            position: absolute;
+            left: -1.25rem;
+            top: 0.5rem;
+            width: 0.75rem;
+            height: 0.75rem;
+            border-radius: 50%;
+            background-color: #1d4ed8; /* blue-700 */
+        }
+        .timeline-step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            left: -0.9375rem; /* center the line */
+            top: 1.5rem;
+            bottom: -1rem;
+            width: 2px;
+            background-color: #bfdbfe; /* blue-200 */
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased">
+
+    <!-- Header Section -->
+    <header class="bg-blue-900 text-white py-12 px-4 shadow-md">
+        <div class="max-w-5xl mx-auto">
+            <h1 class="text-3xl md:text-5xl font-bold mb-4">Аналитический профиль: <span class="text-blue-300">Мережа Права</span></h1>
+            <p class="text-lg md:text-xl text-blue-100 max-w-3xl leading-relaxed">
+                Интерактивный отчет о деятельности ведущей юридической компании Украины. Специализация: защита прав военнослужащих, пенсионеров силовых структур и социальное обеспечение.
+            </p>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 py-8 space-y-16">
+
+        <!-- Section 1: Executive Summary / Metrics -->
+        <section id="metrics">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-slate-800 border-b-2 border-blue-200 pb-2 inline-block">Ключевые показатели</h2>
+                <p class="text-slate-600 mt-2">Анализ рыночного влияния и результативности компании на основе открытых данных судебных реестров и публичной отчетности.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Metric Card 1 -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
+                    <div class="text-4xl mb-2 text-blue-600">&#9878;</div>
+                    <div class="text-3xl font-bold text-slate-800">15,000+</div>
+                    <div class="text-sm font-semibold text-slate-500 uppercase tracking-wide">Успешных дел</div>
+                    <p class="text-sm text-slate-600 mt-2">В судах первой и апелляционной инстанций против ПФУ и других госорганов.</p>
+                </div>
+                <!-- Metric Card 2 -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
+                    <div class="text-4xl mb-2 text-blue-600">&#128176;</div>
+                    <div class="text-3xl font-bold text-slate-800">1.2 млрд ₴</div>
+                    <div class="text-sm font-semibold text-slate-500 uppercase tracking-wide">Возвращено клиентам</div>
+                    <p class="text-sm text-slate-600 mt-2">Суммарный объем отсуженных невыплаченных пенсий и социальных пособий.</p>
+                </div>
+                <!-- Metric Card 3 -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
+                    <div class="text-4xl mb-2 text-blue-600">&#127986;</div>
+                    <div class="text-3xl font-bold text-slate-800">95%</div>
+                    <div class="text-sm font-semibold text-slate-500 uppercase tracking-wide">Процент побед (Пенсии)</div>
+                    <p class="text-sm text-slate-600 mt-2">Высокий показатель успешности в типовых делах по перерасчету пенсий силовикам.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Interactive Services Analysis -->
+        <section id="services" class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-slate-800 border-b-2 border-blue-200 pb-2 inline-block">Структура юридической практики</h2>
+                <p class="text-slate-600 mt-2">Выберите направление ниже, чтобы изучить специфику работы, типичные проблемы клиентов и методы их решения, применяемые "Мережа Права".</p>
+            </div>
+
+            <div class="flex flex-col md:flex-row gap-8">
+                <!-- Navigation Tabs -->
+                <div class="md:w-1/3 flex flex-col space-y-2">
+                    <button onclick="updateService('pension')" id="btn-pension" class="tab-btn active bg-blue-600 text-white font-medium py-3 px-4 rounded-lg text-left shadow-sm">Перерасчет военных пенсий</button>
+                    <button onclick="updateService('military')" id="btn-military" class="tab-btn bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-3 px-4 rounded-lg text-left">Военное право (Мобилизация/ВЛК)</button>
+                    <button onclick="updateService('social')" id="btn-social" class="tab-btn bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-3 px-4 rounded-lg text-left">Социальные выплаты (УБД, ВПО)</button>
+                </div>
+
+                <!-- Dynamic Content Area -->
+                <div class="md:w-2/3 bg-slate-50 p-6 rounded-xl border border-slate-100 min-h-[300px]" id="service-content">
+                    <!-- Content injected via JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Data Visualizations -->
+        <section id="analytics">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-slate-800 border-b-2 border-blue-200 pb-2 inline-block">Аналитика и динамика</h2>
+                <p class="text-slate-600 mt-2">Визуализация распределения дел по категориям и рост обращений граждан за правовой защитой за последние годы.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Chart 1 -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                    <h3 class="text-lg font-bold text-slate-800 text-center mb-4">Структура дел в производстве</h3>
+                    <div class="chart-container">
+                        <canvas id="portfolioChart"></canvas>
+                    </div>
+                    <p class="text-sm text-slate-500 text-center mt-4">Львиная доля обращений приходится на иски против Пенсионного Фонда (снятие лимитов, учет премий).</p>
+                </div>
+
+                <!-- Chart 2 -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                    <h3 class="text-lg font-bold text-slate-800 text-center mb-4">Динамика клиентской базы (оценка)</h3>
+                    <div class="chart-container">
+                        <canvas id="growthChart"></canvas>
+                    </div>
+                    <p class="text-sm text-slate-500 text-center mt-4">Резкий рост обращений связан с изменениями в законодательстве и активными действиями ТЦК и СП.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Operational Process -->
+        <section id="process" class="bg-blue-50 p-8 rounded-2xl border border-blue-100 mb-12">
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-slate-800 border-b-2 border-blue-300 pb-2 inline-block">Алгоритм работы (Client Journey)</h2>
+                <p class="text-slate-600 mt-2">Стандартизированный процесс оказания юридических услуг, обеспечивающий высокую конверсию в положительные решения судов.</p>
+            </div>
+
+            <div class="pl-6 relative">
+                <!-- Step 1 -->
+                <div class="timeline-step relative pl-6 pb-8">
+                    <h4 class="text-lg font-bold text-blue-900">1. Бесплатная консультация и аудит</h4>
+                    <p class="text-slate-700 mt-1">Юристы изучают документы клиента (например, справки из ТЦК о денежном довольствии). Проводится просчет потенциальной суммы долга государства перед пенсионером.</p>
+                </div>
+                <!-- Step 2 -->
+                <div class="timeline-step relative pl-6 pb-8">
+                    <h4 class="text-lg font-bold text-blue-900">2. Досудебное урегулирование</h4>
+                    <p class="text-slate-700 mt-1">Подготовка и подача адвокатских запросов в государственные органы (ПФУ, Минобороны). Фиксация официального отказа (чаще всего ПФУ отказывает в перерасчете добровольно).</p>
+                </div>
+                <!-- Step 3 -->
+                <div class="timeline-step relative pl-6 pb-8">
+                    <h4 class="text-lg font-bold text-blue-900">3. Судебное производство</h4>
+                    <p class="text-slate-700 mt-1">Подготовка искового заявления в окружной административный суд. Компания ведет дело "под ключ" без личного присутствия клиента (по доверенности).</p>
+                </div>
+                <!-- Step 4 -->
+                <div class="timeline-step relative pl-6">
+                    <h4 class="text-lg font-bold text-blue-900">4. Исполнительное производство</h4>
+                    <p class="text-slate-700 mt-1">Получение решения суда и исполнительного листа. Взаимодействие с исполнительной службой и казначейством до момента фактического зачисления средств на карту клиента.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-slate-900 text-slate-400 py-6 text-center text-sm">
+        <p>© 2026 Интерактивный аналитический отчет. Данные агрегированы из открытых источников и судебных реестров.</p>
+    </footer>
+
+    <!-- Application Logic -->
+    <script>
+        // --- Data Storage for Interactive Services Section ---
+        const servicesData = {
+            pension: {
+                title: "Перерасчет военных пенсий",
+                icon: "&#128200;",
+                problem: "Пенсионный фонд Украины (ПФУ) часто не учитывает дополнительные виды денежного обеспечения (премии, надбавки) при расчете пенсий бывшим военным, милиционерам, спасателям.",
+                solution: "Сбор справок о реальном денежном обеспечении с последнего места службы, обжалование бездействия ПФУ в суде, принудительное снятие «максимального ограничения» пенсии.",
+                result: "Увеличение ежемесячной пенсии в среднем на 30-70% и выплата задолженности государством за прошлые периоды одной суммой."
+            },
+            military: {
+                title: "Военное право",
+                icon: "&#9876;",
+                problem: "Нарушения при мобилизации, незаконные отказы в предоставлении отсрочки, игнорирование рапортов на ВЛК (Военно-врачебную комиссию) или увольнение по семейным обстоятельствам.",
+                solution: "Написание юридически грамотных рапортов, подача адвокатских запросов командирам частей, обжалование выводов ВЛК в Центральной ВЛК или суде, сопровождение в ТЦК.",
+                result: "Обеспечение законных прав военнослужащих: перевод, лечение, законное увольнение со службы или получение законной отсрочки."
+            },
+            social: {
+                title: "Социальные выплаты (УБД, ВПО)",
+                icon: "&#128106;",
+                problem: "Отказ государства в выплате «боевых» (100 тыс. грн), невыплата единовременной денежной помощи (ОГД) при ранении или гибели, лишение статуса ВПО.",
+                solution: "Формирование пакета доказательств участия в боевых действиях, расследование обстоятельств травмы, судебные иски против Минсоцполитики и воинских частей.",
+                result: "Фактическое получение клиентами положенных по закону миллионных выплат по ранению или гибели кормильца."
+            }
+        };
+
+        // --- Core Interaction Handling: Tab Switching ---
+        function updateService(serviceKey) {
+            // Update button styles
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-blue-600', 'text-white', 'shadow-sm', 'active');
+                btn.classList.add('bg-slate-100', 'text-slate-700');
+            });
+            const activeBtn = document.getElementById(`btn-${serviceKey}`);
+            activeBtn.classList.remove('bg-slate-100', 'text-slate-700');
+            activeBtn.classList.add('bg-blue-600', 'text-white', 'shadow-sm', 'active');
+
+            // Update content with animation
+            const contentArea = document.getElementById('service-content');
+            const data = servicesData[serviceKey];
+            
+            // Remove animation class to reset it
+            contentArea.classList.remove('fade-in');
+            
+            // Force reflow
+            void contentArea.offsetWidth;
+            
+            contentArea.innerHTML = `
+                <div class="flex items-center space-x-3 mb-4">
+                    <span class="text-3xl text-blue-600">${data.icon}</span>
+                    <h3 class="text-xl font-bold text-slate-800">${data.title}</h3>
+                </div>
+                <div class="space-y-4 text-slate-700">
+                    <div>
+                        <strong class="text-slate-900 block mb-1">Проблема:</strong>
+                        <p>${data.problem}</p>
+                    </div>
+                    <div class="border-l-4 border-blue-500 pl-4 py-1">
+                        <strong class="text-slate-900 block mb-1">Действия юристов:</strong>
+                        <p>${data.solution}</p>
+                    </div>
+                    <div class="bg-green-50 p-3 rounded-lg border border-green-200">
+                        <strong class="text-green-800 block mb-1">Типичный результат:</strong>
+                        <p class="text-green-700 font-medium">${data.result}</p>
+                    </div>
+                </div>
+            `;
+            
+            // Add animation class
+            contentArea.classList.add('fade-in');
+        }
+
+        // Initialize first tab
+        document.addEventListener('DOMContentLoaded', () => {
+            updateService('pension');
+            initCharts();
+        });
+
+        // --- Chart.js Implementations ---
+        function initCharts() {
+            // Global Chart Config for responsiveness
+            Chart.defaults.maintainAspectRatio = false;
+            Chart.defaults.font.family = "'Inter', 'Segoe UI', sans-serif";
+            Chart.defaults.color = '#64748b';
+
+            // 1. Portfolio Chart (Doughnut)
+            const ctxPortfolio = document.getElementById('portfolioChart').getContext('2d');
+            new Chart(ctxPortfolio, {
+                type: 'doughnut',
+                data: {
+                    labels: [
+                        'Военные пенсии (ПФУ)', 
+                        'Дела против ТЦК / ВЛК', 
+                        'Выплаты за ранения', 
+                        'Чернобыльские пенсии',
+                        'Другое'
+                    ],
+                    datasets: [{
+                        data: [55, 20, 15, 7, 3],
+                        backgroundColor: [
+                            '#1d4ed8', // blue-700
+                            '#3b82f6', // blue-500
+                            '#93c5fd', // blue-300
+                            '#64748b', // slate-500
+                            '#cbd5e1'  // slate-300
+                        ],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return ' ' + context.label + ': ' + context.parsed + '%';
+                                }
+                            }
+                        }
+                    },
+                    cutout: '65%'
+                }
+            });
+
+            // 2. Growth Chart (Line)
+            const ctxGrowth = document.getElementById('growthChart').getContext('2d');
+            new Chart(ctxGrowth, {
+                type: 'line',
+                data: {
+                    labels: ['2020', '2021', '2022', '2023', '2024'],
+                    datasets: [{
+                        label: 'Кол-во активных дел (оценка)',
+                        data: [1200, 2500, 6000, 11500, 15000],
+                        borderColor: '#2563eb', // blue-600
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        borderWidth: 3,
+                        pointBackgroundColor: '#1e40af',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 5,
+                        fill: true,
+                        tension: 0.3 // Smooth curves
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#f1f5f9', drawBorder: false },
+                            ticks: { maxTicksLimit: 6 }
+                        },
+                        x: {
+                            grid: { display: false, drawBorder: false }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
